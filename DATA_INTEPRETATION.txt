@@ -1,0 +1,26 @@
+The data are the result of each subject performing the following TASKS in a laboratory:
+1) Password Entry ? 3 different passwords, each typed 20 times
+2 ) Free Text
+10 questions (8 Survey style, 2 Scene Description)
+500 characters typed for each question
+3) Transcription ? Steve Job?s Commencement Speech
+
+There is one folder for each subject, named by subject id. 
+
+Under each folder, there are two files, one for each session where the subject was invited into the lab to contribute some typing. For example, under folder 1227981,
+you will find two files 1227981_V1.txt (session 1) and 1227981_V2.txt (session 2) for subject 1227981.
+Note that there are three or four subjects who have data only for one session.
+
+Within each file, there are multiple lines, each corresponding to one typing activity the subject did in the lab session.
+The format of each line is explained as follows, using the first line that I took from 1227981_V1.txt as example:
+
+Each line is separated into four fields by tab.
+
+1227981_01      1       1ut0eicq3ml85ni3geavqrl6e4      0:61:1312903092233:1242719,1:61:1312903092295:62,0:62:1312903092404:109, ... ,
+^               ^         ^                             ^  ^    ^                ^               ^  ^    ^                   ^                    
+id+session    activity    ignore                        a  b    c                d               a  b    c                   d                                     
+
+a: 0 key pressed; 1 key released
+b: key code
+c: time stamp in millisecond
+d: time lapse since last keystroke, which is redundant information. e.g. 62 = 1312903092295 -1312903092233
