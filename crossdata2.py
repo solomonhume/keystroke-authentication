@@ -78,7 +78,8 @@ for root, dirs, files in os.walk(dataPath, topdown=False): #obtains all files/di
 filepaths.sort()
 namelists.sort()
 namelist = []
-allData = []
+userDia, userTime = [],[] # splits the data into two lists of lists
+diaList,timeList = [],[]
 for no, path in enumerate(filepaths): #loop to open all files
     secondSplit = []
     datapath = open(path,'r')
@@ -87,26 +88,23 @@ for no, path in enumerate(filepaths): #loop to open all files
     for s in firstSplit:
         splitString = s.strip('\n').split(':')
         secondSplit.append(splitString)
-    if len(secondSplit)>12000:
-        allData.append(secondSplit) # adds number only data to a list of lists only if containing more than 10k datapoints
+    if len(secondSplit)>12000: # if user has more that 12k data points, then use them
         namelist.append(namelists[no])
-print "ORGANISING DATA"
+        diaList, timeList = [],[]
+        for loc,dat in enumerate(secondSplit,start=0): # iterate every keystroke
+            if (loc > 0) & (len(dat)>1) & (len(secondSplit[loc-1])>1):
+                if (dat[1].isdigit() and secondSplit[loc-1][1].isdigit()):
+                    timediff = int(dat[1]) - int(secondSplit[loc-1][1])
+                    if (timediff < 500) & (timediff>0): #check for less than 500ms and greater than 0ms
+                        keys = [secondSplit[loc-1][0],dat[0]]
+                        diaList.append(keys) # add diagraphs to a list
+                        timeList.append(float(timediff)) # add times to a list
+        userDia.append(div(diaList,1000)) # add times/diagraphs to lists in sets of 1000
+        userTime.append(div(timeList,1000))
+print "CREATING ATTACK PROFILES"
 print strftime("%H:%M:%S")
-keys = []
-userDia, userTime = [],[] # splits the data into two lists of lists
-for datum in allData: # iterates through each user through a list of character/time pairs
-    diaList, timeList = [],[]
-    for loc,dat in enumerate(datum,start=0): # iterate every keystroke
-        if (loc > 0) & (len(dat)>1) & (len(datum[loc-1])>1):
-            if (dat[1].isdigit() and datum[loc-1][1].isdigit()):
-                timediff = int(dat[1]) - int(datum[loc-1][1])
-                if (timediff < 500) & (timediff>0): #check for less than 500ms and greater than 0ms
-                    keys = [datum[loc-1][0],dat[0]]
-                    diaList.append(keys) # add diagraphs to a list
-                    timeList.append(float(timediff)) # add times to a list
-    userDia.append(div(diaList,1000))
-    userTime.append(div(timeList,1000))
 profiles = [] # list to store the 20 profiles
+atktraining,atktesting,atksubprof = [],[],[]
 for listdia,listtime in zip(userDia,userTime):
     proflist = [] # list to store each infdivdual profile, reset each loop
     for subdia,subtime in zip(listdia,listtime):
@@ -115,10 +113,7 @@ for listdia,listtime in zip(userDia,userTime):
             profileDict = orgDiagraph(profileDict,dia,time)
         proflist.append(profileDict) # add dictionary to the list
     profiles.append(proflist) # add list to profile list
-print "CREATING PROFILES"
 print strftime("%H:%M:%S")
-atktraining = []
-atktesting = []
 for prof in profiles: # iterate through all profiles
     atksubprof = []
     for lists in prof: # iterate through the 20 dictionaries

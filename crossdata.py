@@ -88,8 +88,6 @@ for no, path in enumerate(filepaths): #loop to open all files
     for s in firstSplit:
         splitString = s.strip('\n').split(':')
         secondSplit.append(splitString)
-    if not secondSplit:
-        print("shit")
     if len(secondSplit)>12000: # if user has more that 12k data points, then use them
         namelist.append(namelists[no])
         diaList, timeList = [],[]
