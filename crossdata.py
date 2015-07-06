@@ -124,8 +124,11 @@ for prof in profiles: # iterate through all profiles
         atksubprof.append(atkProf)
     atktraining.append(atksubprof[:(len(atksubprof)//2)])
     atktesting.append(atksubprof[(len(atksubprof)//2):])
-finsumscore,findifscore,sumthresh,difthresh,sumfar,sumipr,diffar,difipr,sumatkscore,difatkscore = [],[],[],[],[],[],[],[],[],[] # lists to store data for prining to .csv
+newpath = '/home/andrew/Documents/Research/keystroke-authentication/results2.csv'
+
+avgsumthresh,avgsumfar,avgsumipr,avgfinsumscore,avgsumatkscore,avgdifthresh,avgdiffar,avgdifipr,avgfindifscore,avgdifatkscore = [],[],[],[],[],[],[],[],[],[]
 for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
+    finsumscore,findifscore,sumthresh,difthresh,sumfar,sumipr,diffar,difipr,sumatkscore,difatkscore = [],[],[],[],[],[],[],[],[],[] # lists to store data for prining to .csv
     print "USER %s PROFILE" % namelist[useNum][:7]
     print strftime("%H:%M:%S")
     avguscore1,avguscore2,avgiscore1,avgiscore2 = [],[],[],[]
@@ -181,41 +184,53 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
                 for atk2 in atk:
                     impostScores2.append(difference(finref,atk2))
 
-    cutoffs  = np.linspace((max(impostScores)+.002),(min(userScores)-.002),100)
-    results = {}
-    FAR  = np.array([])
-    IPR  = np.array([])
-    for i in range(len(cutoffs)):
-        y = str(i)
-        results['users'+y] = len(list(x for x in userScores if x <= cutoffs[i])) # users below threshold
-        results['impostors'+y] = len(list(x for x in impostScores if x <= cutoffs[i])) # impostors below threshold
-        FAR = np.append(FAR,(1-float(results['users'+y])/float(len(userScores)))*100)
-        IPR = np.append(IPR,float(results['impostors'+y])/float(len(userScores))*100)
-    summed = FAR + IPR
-    summin = np.argmin(summed)
-    dif = abs(FAR-IPR)
-    difmin= np.argmin(dif)
-    finsumscore.append(len(list(x for x in userScores2 if x >= cutoffs[summin]))/float(len(userScores2)*100))
-    findifscore.append(len(list(x for x in userScores2 if x >= cutoffs[difmin]))/float(len(userScores2)*100))
-    sumatkscore.append(len(list(x for x in impostScores2 if x <= cutoffs[summin]))/float(len(impostScores2)*100))
-    difatkscore.append(len(list(x for x in impostScores2 if x <= cutoffs[difmin]))/float(len(impostScores2)*100))
-    sumthresh.append(cutoffs[summin])
-    difthresh.append(cutoffs[difmin])
-    sumfar.append(FAR[summin])
-    sumipr.append(IPR[summin])
-    diffar.append(FAR[difmin])
-    difipr.append(IPR[difmin])
+        cutoffs  = np.linspace((max(impostScores)+.002),(min(userScores)-.002),100)
+        results = {}
+        FAR  = np.array([])
+        IPR  = np.array([])
+        for i in range(len(cutoffs)):
+            y = str(i)
+            results['users'+y] = len(list(x for x in userScores if x <= cutoffs[i])) # users below threshold
+            results['impostors'+y] = len(list(x for x in impostScores if x <= cutoffs[i])) # impostors below threshold
+            FAR = np.append(FAR,(1-float(results['users'+y])/float(len(userScores)))*100)
+            IPR = np.append(IPR,float(results['impostors'+y])/float(len(userScores))*100)
+        summed = FAR + IPR
+        summin = np.argmin(summed)
+        dif = abs(FAR-IPR)
+        difmin= np.argmin(dif)
+        finsumscore.append(len(list(x for x in userScores2 if x >= cutoffs[summin]))/float(len(userScores2)*100))
+        findifscore.append(len(list(x for x in userScores2 if x >= cutoffs[difmin]))/float(len(userScores2)*100))
+        sumatkscore.append(len(list(x for x in impostScores2 if x <= cutoffs[summin]))/float(len(impostScores2)*100))
+        difatkscore.append(len(list(x for x in impostScores2 if x <= cutoffs[difmin]))/float(len(impostScores2)*100))
+        sumthresh.append(cutoffs[summin])
+        difthresh.append(cutoffs[difmin])
+        sumfar.append(FAR[summin])
+        sumipr.append(IPR[summin])
+        diffar.append(FAR[difmin])
+        difipr.append(IPR[difmin])
+    print sum(sumthresh)/float(len(sumthresh))
+    print sum(difthresh)/float(len(sumthresh))
+    avgsumthresh.append(sum(sumthresh)/float(len(combo)))
+    avgsumipr.append(sum(sumipr)/float(len(combo)))
+    avgsumfar.append(sum(sumfar)/float(len(combo)))
+    avgfinsumscore.append(sum(finsumscore)/float(len(combo)))
+    avgsumatkscore.append(sum(sumatkscore)/float(len(combo)))
+    avgdifthresh.append(sum(difthresh)/float(len(combo)))
+    avgdiffar.append(sum(diffar)/float(len(combo)))
+    avgdifipr.append(sum(difipr)/float(len(combo)))
+    avgfindifscore.append(sum(findifscore)/float(len(combo)))
+    avgdifatkscore.append(sum(difatkscore)/float(len(combo)))
 with open(newpath,'w') as outfile:
     a = csv.writer(outfile, delimiter=',')
-    for x in range(len(sumfar)):
+    for x in range(len(namelist)):
         a.writerow([namelist[x][:-4],
-                    sumthresh[x],
-                    sumfar[x],
-                    sumipr[x],
-                    finsumscore[x],
-                    sumatkscore[x],
-                    difthresh[x],
-                    diffar[x],
-                    difipr[x],
-                    findifscore[x],
-                    difatkscore[x]])
+                    avgsumthresh[x],
+                    avgsumfar[x],
+                    avgsumipr[x],
+                    avgfinsumscore[x],
+                    avgsumatkscore[x],
+                    avgdifthresh[x],
+                    avgdiffar[x],
+                    avgdifipr[x],
+                    avgfindifscore[x],
+                    avgdifatkscore[x]])
