@@ -124,7 +124,7 @@ for prof in profiles: # iterate through all profiles
         atksubprof.append(atkProf)
     atktraining.append(atksubprof[:(len(atksubprof)//2)])
     atktesting.append(atksubprof[(len(atksubprof)//2):])
-newpath = '/home/andrew/Documents/Research/keystroke-authentication/results2.csv'
+newpath = '/home/andrew/Documents/Research/keystroke-authentication/results.csv'
 
 avgsumthresh,avgsumfar,avgsumipr,avgfinsumscore,avgsumatkscore,avgdifthresh,avgdiffar,avgdifipr,avgfindifscore,avgdifatkscore = [],[],[],[],[],[],[],[],[],[]
 for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
@@ -192,7 +192,7 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
             y = str(i)
             results['users'+y] = len(list(x for x in userScores if x <= cutoffs[i])) # users below threshold
             results['impostors'+y] = len(list(x for x in impostScores if x <= cutoffs[i])) # impostors below threshold
-            FAR = np.append(FAR,(1-float(results['users'+y])/float(len(userScores)))*100)
+            FAR = np.append(FAR,(1-float(results['users'+y])/float(len(impostScores)))*100)
             IPR = np.append(IPR,float(results['impostors'+y])/float(len(userScores))*100)
         summed = FAR + IPR
         summin = np.argmin(summed)
@@ -210,16 +210,16 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
         difipr.append(IPR[difmin])
     print sum(sumthresh)/float(len(sumthresh))
     print sum(difthresh)/float(len(sumthresh))
-    avgsumthresh.append(sum(sumthresh)/float(len(combo)))
-    avgsumipr.append(sum(sumipr)/float(len(combo)))
-    avgsumfar.append(sum(sumfar)/float(len(combo)))
-    avgfinsumscore.append(sum(finsumscore)/float(len(combo)))
-    avgsumatkscore.append(sum(sumatkscore)/float(len(combo)))
-    avgdifthresh.append(sum(difthresh)/float(len(combo)))
-    avgdiffar.append(sum(diffar)/float(len(combo)))
-    avgdifipr.append(sum(difipr)/float(len(combo)))
-    avgfindifscore.append(sum(findifscore)/float(len(combo)))
-    avgdifatkscore.append(sum(difatkscore)/float(len(combo)))
+    avgsumthresh.append(sum(sumthresh)/float(len(sumthresh)))
+    avgsumipr.append(sum(sumipr)/float(len(sumipr)))
+    avgsumfar.append(sum(sumfar)/float(len(sumfar)))
+    avgfinsumscore.append(sum(finsumscore)/float(len(finsumscore)))
+    avgsumatkscore.append(sum(sumatkscore)/float(len(sumatkscore)))
+    avgdifthresh.append(sum(difthresh)/float(len(difthresh)))
+    avgdiffar.append(sum(diffar)/float(len(diffar)))
+    avgdifipr.append(sum(difipr)/float(len(difipr)))
+    avgfindifscore.append(sum(findifscore)/float(len(findifscore)))
+    avgdifatkscore.append(sum(difatkscore)/float(len(difatkscore)))
 with open(newpath,'w') as outfile:
     a = csv.writer(outfile, delimiter=',')
     for x in range(len(namelist)):

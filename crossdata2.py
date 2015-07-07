@@ -184,7 +184,7 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
             y = str(i)
             results['users'+y] = len(list(x for x in userScores if x <= cutoffs[i])) # users below threshold
             results['impostors'+y] = len(list(x for x in impostScores if x <= cutoffs[i])) # impostors below threshold
-            FAR = np.append(FAR,(1-float(results['users'+y])/float(len(userScores)))*100)
+            FAR = np.append(FAR,(1-float(results['users'+y])/float(len(impostScores)))*100)
             IPR = np.append(IPR,float(results['impostors'+y])/float(len(userScores))*100)
         summed = FAR + IPR
         summin = np.argmin(summed)
