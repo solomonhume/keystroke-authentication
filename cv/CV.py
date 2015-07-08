@@ -10,7 +10,7 @@ class CV(object):
 
     def __init__(self, auth, data):
         '''
-        takes a dictionary (username -> [(n-graph -> [latencies])])
+        takes a dictionary (username -> [(ngraph -> [latencies])])
         username maps to list of samples (1k keystrokes) represented
         as dictionaries.
 
