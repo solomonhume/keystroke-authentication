@@ -20,8 +20,8 @@ if __name__=='__main__':
                     ],
                  'b' : [{'ba' : range(0,20,3), 
                          'bb' : range(15)},
-                        {'bc' : range(2,20,4),
-                         'bd' : range(50,300,150)}
+                        {'bc' : range(2,20,4)},
+                        {'bd' : range(50,300,150)}
                     ],
     }
 

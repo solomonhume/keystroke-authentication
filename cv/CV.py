@@ -17,14 +17,7 @@ class CV(object):
         '''
         self.data = data
         self.auth = auth()
-        self.p = {}
-        for u in data.keys():
-            l = len(data[u])
-            if l > 30:
-                self.p[u] = 1
-            else:
-                self.p[u] = min(2,l-1)
-
+        self.p = {u:(1 if len(data[u]) > 30 else 2) for u in data.keys()}
 
 
     def partition_data(self, u, samples, p):
