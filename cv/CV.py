@@ -1,4 +1,7 @@
 import itertools
+import pprint
+
+from Authenticator import Authenticator
 
 class CV(object):
     '''
@@ -13,14 +16,14 @@ class CV(object):
 
         '''
         self.data = data
-        self.auth = auth
+        self.auth = auth()
         self.p = {}
         for u in data.keys():
             l = len(data[u])
             if l > 30:
                 self.p[u] = 1
             else:
-                self.p[u] = 2
+                self.p[u] = min(2,l-1)
 
 
 
@@ -41,17 +44,17 @@ class CV(object):
             yield u, train_samples, val_samples
 
 
-    def validate(self, data):
+    def validate(self):
         '''
         takes (username -> [(n-graph -> [latencies])])
         returns a list of results from several partitions of the data
         '''
         for partition in itertools.product(
-                partition_data(u, self.data[u],p[u]) for u in self.data.keys()
+                *[self.partition_data(u, self.data[u], self.p[u]) 
+                for u in self.data.keys()]
         ):
-
             train = {x[0]:x[1] for x in list(partition)}
-            test = {x[0]:x[2] for x in list(partition)}
+            val = {x[0]:x[2] for x in list(partition)}
 
             self.auth.train(train)
             yield self.auth.evaluate(val)
