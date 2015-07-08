@@ -4,7 +4,7 @@ class CV(object):
     '''
     implements truncated leave-p-out CV
     '''
-    
+
     def __init__(self, auth, data):
         '''
         takes a dictionary (username -> [(n-graph -> [latencies])])
@@ -12,11 +12,18 @@ class CV(object):
         as dictionaries.
 
         '''
-        # TODO compute p
         self.data = data
         self.auth = auth
+        self.p = {}
+        for u in data.keys():
+            l = len(data[u])
+            if l > 30:
+                self.p[u] = 1
+            else:
+                self.p[u] = 2
 
-    
+
+
     def partition_data(self, u, samples, p):
         '''
         takes a username and list of dictionaries [(n-graph -> [latencies])]
@@ -26,25 +33,25 @@ class CV(object):
         '''
         sample_numbers = xrange(len(samples))
         for leftout_ind in itertools.combinations(sample_numbers,p):
-            val_samples = [ samples[i] 
+            val_samples = [ samples[i]
                              for i in list(leftout_ind) ]
-            train_samples = [ samples[i] 
-                              for i in sample_numbers 
+            train_samples = [ samples[i]
+                              for i in sample_numbers
                               if not i in list(leftout_ind) ]
             yield u, train_samples, val_samples
-        
-    
+
+
     def validate(self, data):
         '''
         takes (username -> [(n-graph -> [latencies])])
         returns a list of results from several partitions of the data
         '''
         for partition in itertools.product(
-                partition_data(u, self.data[u],p) for u in self.data.keys()
+                partition_data(u, self.data[u],p[u]) for u in self.data.keys()
         ):
-            
+
             train = {x[0]:x[1] for x in list(partition)}
             test = {x[0]:x[2] for x in list(partition)}
-            
+
             self.auth.train(train)
             yield self.auth.evaluate(val)
