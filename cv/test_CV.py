@@ -22,7 +22,7 @@ class TestAuth(Authenticator):
 
 if __name__=='__main__':
 
-    test_data = {'a' : [coll.defaultdict(list, {'aa' : range(10,1000,100), 
+    test_data = {'a' : [coll.defaultdict(list, {'aa' : range(10,100,10), 
                                                 'ab' : range(1,10)}),
                         coll.defaultdict(list, {'ac' : range(1,10,2),
                                                 'aa' : [2,2,2]}),
