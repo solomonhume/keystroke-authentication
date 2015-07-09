@@ -31,15 +31,18 @@ def to_lat_dict(training_data):
     return lat_dict
 
 
-def process_latencies(lat_dict, proc):
+def process_latencies(lat_dict, proc, default):
     '''
     Takes a latency dictionary (user str -> (ngraph -> [latencies]))
     and a function operating on lists of latencies
+    and a function returning a default value
     returns a dictionary (user str -> (ngraph -> processed_latencies))
+    where (ngraph-> processed_latencies) is a default dict using the 
+    specified default function.
     '''
     p_lat = {}
     for u in lat_dict.keys():
-        p_lat[u] = coll.defaultdict(lambda x: (-1., -1., -1.))
+        p_lat[u] = coll.defaultdict(default)
         for ng in lat_dict[u].keys():
             p_lat[u][ng] = proc(lat_dict[u][ng])
     return p_lat
