@@ -12,15 +12,15 @@ class GammaBFAuth(Authenticator):
         
 
     def train(self, training_data):
-        temp = to_lat_dict(training_data)
-        for u in temp.keys():
-            print temp[u].keys()
-        
         self.params = process_latencies(to_lat_dict(training_data),
                                         lambda x: stats.gamma.fit(
                                             x, floc=0),
                                         lambda x: (-1.,-1.,-1.)
         )
+        
+        for u in params.keys():
+            # score all of the samples under each user's parameters
+            # and find a likelihood
         
     
     def evaluate(self, val_data):
