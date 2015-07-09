@@ -34,7 +34,7 @@ if __name__=='__main__':
                     ],
     }
 
-    test_cv = CV(test_auth, test_data)
+    test_cv = CV(TestAuth, test_data)
     pp = pprint.PrettyPrinter()
     pp.pprint(test_cv.p)
     '''
