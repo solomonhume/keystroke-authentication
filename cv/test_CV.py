@@ -34,7 +34,7 @@ if __name__=='__main__':
                         coll.defaultdict(list, {'bd' : range(50,300,150)})
                     ],
     }
-    test_auth = TestAuth
+    test_auth = GammaBFAuth
     
     test_cv = CV(test_auth, test_data)
     pp = pprint.PrettyPrinter()
@@ -50,6 +50,3 @@ if __name__=='__main__':
 
     for i in test_cv.validate():
         pass
-
-    print
-    print data_manip.to_lat_dict(test_data)
