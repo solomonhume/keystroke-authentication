@@ -1,9 +1,12 @@
+import collections as coll
 import pprint
 
 from Authenticator import Authenticator
 from CV import CV
+import gamma_mle
+from GammaBayesFactorAuthenticator import GammaBFAuth
 
-class test_auth(Authenticator):
+class TestAuth(Authenticator):
     def train(self, training_data):
         print 'training', training_data
     
@@ -13,18 +16,20 @@ class test_auth(Authenticator):
 
 
 if __name__=='__main__':
-    test_data = {'a' : [{'aa' : range(10,1000,100), 
-                         'ab' : range(10)},
-                        {'ac' : range(0,10,2)},
-                        {'ad' : range(10, 20, 3)}
+    test_data = {'a' : [coll.defaultdict(list, {'aa' : range(10,1000,100), 
+                                                'ab' : range(1,10)}),
+                        coll.defaultdict(list, {'ac' : range(1,10,2),
+                                                'aa' : [2,2,2]}),
+                        coll.defaultdict(list, {'ad' : range(10, 20, 3)})
                     ],
-                 'b' : [{'ba' : range(0,20,3), 
-                         'bb' : range(15)},
-                        {'bc' : range(2,20,4)},
-                        {'bd' : range(50,300,150)}
+                 'b' : [coll.defaultdict(list, {'ba' : range(1,20,3), 
+                                                'bb' : range(1,15)}),
+                        coll.defaultdict(list, {'bc' : range(2,20,4)}),
+                        coll.defaultdict(list, {'bd' : range(50,300,150)})
                     ],
     }
-
+    test_auth = GammaBFAuth
+    
     test_cv = CV(test_auth, test_data)
     pp = pprint.PrettyPrinter()
     pp.pprint(test_cv.p)
@@ -39,3 +44,6 @@ if __name__=='__main__':
 
     for i in test_cv.validate():
         pass
+
+    print
+    print gamma_mle.to_lat_dict(test_data)

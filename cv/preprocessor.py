@@ -1,3 +1,4 @@
+import collections as coll
 import os
 
 DATA_DIR = './combine'
@@ -46,7 +47,7 @@ def ngraph_ls2dict(ls):
     takes [(ngraph, latency)]
     returns dict (ngraph -> [latency])
     '''
-    d = {}
+    d = coll.defaultdict(list)
     for ng_t in ls:
         if ng_t[0] in d: d[ng_t[0]].append(ng_t[1])
         else: d[ng_t[0]] = [ng_t[1]]
