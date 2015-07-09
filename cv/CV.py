@@ -2,6 +2,7 @@ import itertools
 import pprint
 
 from Authenticator import Authenticator
+from Density import DensityAuth
 
 class CV(object):
     '''

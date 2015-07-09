@@ -3,20 +3,18 @@ import pprint
 
 from Authenticator import Authenticator
 from CV import CV
+from Density import DensityAuth
 
-import Density as dn
 import data_manip
 
 
 class TestAuth(Authenticator):
     def train(self, training_data):
-        print 'training', training_data
-        print
+        pass
 
 
     def evaluate(self, val_data):
-        print 'validating', val_data
-        print
+        pass
 
 
 if __name__=='__main__':
@@ -34,17 +32,12 @@ if __name__=='__main__':
                     ],
     }
 
-    test_cv = CV(TestAuth, test_data)
-    pp = pprint.PrettyPrinter()
-    pp.pprint(test_cv.p)
+    test_cv = CV(DensityAuth, test_data)
     '''
 
     for i in test_cv.partition_data('shit', test_data['a'], 1):
         fuck.pprint(i)
     '''
-    print 'test dataset:'
-    pp.pprint(test_data)
-    print
 
     for i in test_cv.validate():
         pass
