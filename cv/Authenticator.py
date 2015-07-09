@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+import pylab as P
+
 class Authenticator(object):
     __metaclass__ = ABCMeta
     
@@ -35,3 +37,21 @@ def evaluate_threshold(threshold, scores):
         elif i[0] == 1 and i[1] == 1:
             gt += 1
     return float(ip)/it, float(fr)/gt, gt, it
+
+
+def compute_best_threshold(scores, loss):
+    '''
+    takes [(score, 1|0)] and function
+    loss(ipr, frr, gt, it)
+    chooses the best score in the list to
+    minimize result of loss
+
+    returns threshold score.
+    '''
+    best_loss = P.np.inf
+    for t in scores:
+        new_l = loss(*evaluate_threshold(t[0], scores))
+        if new_l < best_loss:
+            best_loss = new_l
+            best_score = t[0]
+    return t[0]

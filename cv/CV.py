@@ -1,5 +1,4 @@
 import itertools
-import pprint
 
 from Authenticator import Authenticator
 
@@ -47,7 +46,6 @@ class CV(object):
                 for u in self.data.keys()]
         ):
             train = {x[0]:x[1] for x in list(partition)}
-            print train
             val = {x[0]:x[2] for x in list(partition)}
 
             self.auth.train(train)
