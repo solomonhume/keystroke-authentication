@@ -43,7 +43,7 @@ class CV(object):
         returns a list of results from several partitions of the data
         '''
         for partition in itertools.product(
-                *[self.partition_data(u, self.data[u], self.p[u]) 
+                *[self.partition_data(u, self.data[u], self.p[u])
                 for u in self.data.keys()]
         ):
             train = {x[0]:x[1] for x in list(partition)}

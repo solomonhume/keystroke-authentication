@@ -3,19 +3,25 @@ import pprint
 
 from Authenticator import Authenticator
 from CV import CV
-import gamma_mle
+
+import Density as dn
+import data_manip
 from GammaBayesFactorAuthenticator import GammaBFAuth
+
 
 class TestAuth(Authenticator):
     def train(self, training_data):
         print 'training', training_data
-    
+        print 
+
+
     def evaluate(self, val_data):
         print 'validating', val_data
         print
 
 
 if __name__=='__main__':
+
     test_data = {'a' : [coll.defaultdict(list, {'aa' : range(10,1000,100), 
                                                 'ab' : range(1,10)}),
                         coll.defaultdict(list, {'ac' : range(1,10,2),
@@ -28,7 +34,7 @@ if __name__=='__main__':
                         coll.defaultdict(list, {'bd' : range(50,300,150)})
                     ],
     }
-    test_auth = GammaBFAuth
+    test_auth = TestAuth
     
     test_cv = CV(test_auth, test_data)
     pp = pprint.PrettyPrinter()
@@ -46,4 +52,4 @@ if __name__=='__main__':
         pass
 
     print
-    print gamma_mle.to_lat_dict(test_data)
+    print data_manip.to_lat_dict(test_data)
