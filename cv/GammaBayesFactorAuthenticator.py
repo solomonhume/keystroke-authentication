@@ -15,13 +15,13 @@ class GammaBFAuth(Authenticator):
         temp = to_lat_dict(training_data)
         for u in temp.keys():
             print temp[u].keys()
+        
         self.params = process_latencies(to_lat_dict(training_data),
                                         lambda x: stats.gamma.fit(
                                             x, floc=0),
                                         lambda x: (-1.,-1.,-1.)
         )
-        print self.params
+        
     
-
     def evaluate(self, val_data):
         pass
