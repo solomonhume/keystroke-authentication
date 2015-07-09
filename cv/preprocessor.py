@@ -11,16 +11,17 @@ def load_data(ng_len=2, lat_lb=20, lat_ub=500):
     ngraph length, defaults to 2
     lower bound on latency, defaults to 20
     upper bound on latency, defaults to 500
-    
+
     returns dict (user str -> [(ngraph, latency)])
     '''
     data_dict = {}
     d = {}
 
     for f in FILE_LS:
+        if f in {'999999.txt','SERLHOU.txt'}:
         data = file(DATA_DIR+'/'+f).read()
-        pairs = [x.rsplit(':',1) 
-                 for x in 
+        pairs = [x.rsplit(':',1)
+                 for x in
                  data.replace('\n','\t').split('\t')
              ]
         pairs = [(x[0], int(x[1])) for x in pairs if len(x) == 2]
@@ -62,8 +63,8 @@ def split_samples(data_dict, sample_size=1000):
     returns dict (user str -> [(ngraph -> [latency])])
     '''
     return {k:map(ngraph_ls2dict,chunkify(v,sample_size)) for k,v in data_dict.items()}
-    
-    
+
+
 if __name__=='__main__':
     d = split_samples(load_data())
     print len(d['1227981'])

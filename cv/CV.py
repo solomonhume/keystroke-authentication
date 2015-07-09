@@ -1,6 +1,7 @@
 import itertools
 
 from Authenticator import Authenticator
+from Density import DensityAuth
 
 class CV(object):
     '''
