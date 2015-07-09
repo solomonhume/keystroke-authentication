@@ -50,9 +50,8 @@ def difference(prof1,prof2):
 
 class DensityAuth(Authenticator):
     def train(self,training_data):
-        print len(training_data)
         for n,u in enumerate(training_data):
-            pass#print training_data[u][n]
+            pass
             #ref = dict(training_data[u].items()[len(training_data[u])/2:])
             #train = dict(training_data[u].items()[:len(training_data[u])/2])
         temp = to_lat_dict(training_data)

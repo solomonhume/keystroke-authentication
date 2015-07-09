@@ -6,7 +6,6 @@ import csv
 import itertools
 import scipy
 from scipy import stats
-from statsmodels.distributions.mixture_rvs import mixture_rvs
 from time import strftime
 
 
@@ -18,6 +17,8 @@ def chunk(list1, num):  # function to split a list into roughly equal parts
 def div(l, n):
     n = max(1, n)
     last = [l[i:i + n] for i in range(0, len(l), n)]
+    if len(last[-1])<(n):
+        del last[-1]
     return last
 
 def orgDiagraph(dict1,dia ,time): # function to orgainze diagraphs into dictionary
@@ -88,6 +89,7 @@ for no, path in enumerate(filepaths): #loop to open all files
     for s in firstSplit:
         splitString = s.strip('\n').split(':')
         secondSplit.append(splitString)
+    print len(secondSplit)//1000
     if len(secondSplit)>12000: # if user has more that 12k data points, then use them
         namelist.append(namelists[no])
         diaList, timeList = [],[]
@@ -183,7 +185,6 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
             if atknum != useNum: # ignore the profile that would result in verification
                 for atk2 in atk:
                     impostScores2.append(difference(finref,atk2))
-
         cutoffs  = np.linspace((max(impostScores)+.002),(min(userScores)-.002),100)
         results = {}
         FAR  = np.array([])

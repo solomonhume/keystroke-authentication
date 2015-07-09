@@ -18,20 +18,20 @@ def load_data(ng_len=2, lat_lb=20, lat_ub=500):
     d = {}
 
     for f in FILE_LS:
-        if f in {'999999.txt','SERLHOU.txt'}:
-        data = file(DATA_DIR+'/'+f).read()
-        pairs = [x.rsplit(':',1)
+        if f in {'9999999.txt','SERLHOU.txt'}:
+            data = file(DATA_DIR+'/'+f).read()
+            pairs = [x.rsplit(':',1)
                  for x in
                  data.replace('\n','\t').split('\t')
              ]
-        pairs = [(x[0], int(x[1])) for x in pairs if len(x) == 2]
-        ngraphs = []
-        for i in range(len(pairs)-ng_len):
-            ng_t = (''.join([x[0] for x in pairs[i:i+ng_len]]),
+            pairs = [(x[0], int(x[1])) for x in pairs if len(x) == 2]
+            ngraphs = []
+            for i in range(len(pairs)-ng_len):
+                ng_t = (''.join([x[0] for x in pairs[i:i+ng_len]]),
                              pairs[i+ng_len][1] - pairs[i][1])
-            if lat_lb <= ng_t[1] <= lat_ub: ngraphs.append(ng_t)
-        k = f[:-4] #the file name without extension (e.g. ".txt")
-        d[k] = ngraphs
+                if lat_lb <= ng_t[1] <= lat_ub: ngraphs.append(ng_t)
+            k = f[:-4] #the file name without extension (e.g. ".txt")
+            d[k] = ngraphs
     return d
 
 
@@ -67,5 +67,6 @@ def split_samples(data_dict, sample_size=1000):
 
 if __name__=='__main__':
     d = split_samples(load_data())
-    print len(d['1227981'])
-    print d['1227981'][0]['TH'][:10]
+    print len(d)
+    #print len(d['1227981'])
+    #print d['1227981'][0]['TH'][:10]
