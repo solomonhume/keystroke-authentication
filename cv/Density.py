@@ -13,6 +13,7 @@ def density(data):
                 kde = sm.nonparametric.KDEUnivariate(laten)
                 kde.fit(bw=nrd0(laten))
                 d[u][dgraph] = kde.evaluate(range(501))
+    return d
 
 def nrd0(x):
     """
