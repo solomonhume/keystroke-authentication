@@ -18,7 +18,6 @@ def load_data(ng_len=2, lat_lb=20, lat_ub=500):
     d = {}
 
     for f in FILE_LS:
-        if f in {'999999.txt','SERLHOU.txt'}:
         data = file(DATA_DIR+'/'+f).read()
         pairs = [x.rsplit(':',1)
                  for x in

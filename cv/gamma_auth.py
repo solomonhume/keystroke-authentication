@@ -1,5 +1,6 @@
 import pylab as P
 import scipy.stats as stats
+import scipy.misc as misc
 
 def log_gamma_likelihood(g_param, data):
     '''
@@ -8,12 +9,14 @@ def log_gamma_likelihood(g_param, data):
     data is a list of latencies for the ngraph associated
     with the parameters
     '''
+    if data == []: 
+        return 0.
     if g_param[0] > 0 and g_param[2] > 0:
         return sum([stats.gamma.logpdf(x, 
                                        g_param[0], 
                                        scale=g_param[2], 
                                        loc=0) 
-                    for x in data]) if data != [] else 0
+                    for x in data])
     return (P.np.log(1.) - P.np.log(480.))
 
 
@@ -37,7 +40,7 @@ def compute_likelihoods(params, samples):
     returns a dictionary {users -> [(likelihoods, 1|0 (genuine/impostor))]}
     '''
     ll_dict = {u:[] for u in params.keys()}
-    # u_samples has type (user, [{ngraphs -> [latency]}])
+    # user_samples has type (user, [{ngraphs -> [latency]}])
     for user_samples in samples.iteritems():
         current_user = user_samples[0]
         for samp in user_samples[1]:
@@ -60,9 +63,7 @@ def compute_bayesfactors(ll_dict):
             impostor_lls = [ll_dict[impostor][i][0] 
                             for impostor in ll_dict.keys()
                             if impostor != u]
-            l_impostor = reduce(P.np.logaddexp,
-                                impostor_lls[1:],
-                                impostor_lls[0])
+            l_impostor = misc.logsumexp(impostor_lls)
             l_genuine = ll_dict[u][i][0]
             bf_dict[u].append( 
                 ((l_genuine-l_impostor), 
