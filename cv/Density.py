@@ -50,14 +50,9 @@ def difference(prof1,prof2):
 
 class DensityAuth(Authenticator):
     def train(self,training_data):
-        for n,u in enumerate(training_data):
-            pass
-            #ref = dict(training_data[u].items()[len(training_data[u])/2:])
-            #train = dict(training_data[u].items()[:len(training_data[u])/2])
-        temp = to_lat_dict(training_data)
-        kden = process_latencies(temp,kdensity,None)
-        for u in temp.keys():
-            pass
-            #print temp[u].keys()
+        ref = train[len(train)//2:]
+        train2 = train[:len(train)//2]
+        rden = process_latencies(ref,kdensity,None)
+        tden = process_latencies(ref,kdensity,None)
     def evaluate(data,self):
         pass

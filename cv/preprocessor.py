@@ -18,20 +18,19 @@ def load_data(ng_len=2, lat_lb=20, lat_ub=500):
     d = {}
 
     for f in FILE_LS:
-        if f in {'9999999.txt','SERLHOU.txt'}:
-            data = file(DATA_DIR+'/'+f).read()
-            pairs = [x.rsplit(':',1)
-                 for x in
-                 data.replace('\n','\t').split('\t')
-             ]
-            pairs = [(x[0], int(x[1])) for x in pairs if len(x) == 2]
-            ngraphs = []
-            for i in range(len(pairs)-ng_len):
-                ng_t = (''.join([x[0] for x in pairs[i:i+ng_len]]),
-                             pairs[i+ng_len][1] - pairs[i][1])
-                if lat_lb <= ng_t[1] <= lat_ub: ngraphs.append(ng_t)
-            k = f[:-4] #the file name without extension (e.g. ".txt")
-            d[k] = ngraphs
+        data = file(DATA_DIR+'/'+f).read()
+        pairs = [x.rsplit(':',1)
+            for x in
+            data.replace('\n','\t').split('\t')
+            ]
+        pairs = [(x[0], int(x[1])) for x in pairs if len(x) == 2]
+        ngraphs = []
+        for i in range(len(pairs)-ng_len):
+            ng_t = (''.join([x[0] for x in pairs[i:i+ng_len]]),
+                        pairs[i+ng_len][1] - pairs[i][1])
+            if lat_lb <= ng_t[1] <= lat_ub: ngraphs.append(ng_t)
+        k = f[:-4] #the file name without extension (e.g. ".txt")
+        d[k] = ngraphs
     return d
 
 
@@ -48,7 +47,7 @@ def ngraph_ls2dict(ls):
     takes [(ngraph, latency)]
     returns dict (ngraph -> [latency])
     '''
-    d = coll.defaultdict(list)
+    d = {}
     for ng_t in ls:
         if ng_t[0] in d: d[ng_t[0]].append(ng_t[1])
         else: d[ng_t[0]] = [ng_t[1]]

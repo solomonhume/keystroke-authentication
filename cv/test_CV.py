@@ -5,9 +5,7 @@ from Authenticator import Authenticator
 from CV import CV
 from Density import DensityAuth
 
-
 import data_manip
-
 
 class TestAuth(Authenticator):
     def train(self, training_data):
@@ -34,7 +32,10 @@ if __name__=='__main__':
     }
     """
     test_data = pp.split_samples(pp.load_data())
-
+    for u in test_data.keys():
+        if u not in {'9999999','SERLHOU'}:
+            del test_data[u]
+    print test_data.keys()
     test_cv = CV(DensityAuth, test_data)
     '''
 
