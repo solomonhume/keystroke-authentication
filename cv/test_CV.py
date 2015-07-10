@@ -1,9 +1,10 @@
 import collections as coll
-import pprint
+import preprocessor as pp
 
 from Authenticator import Authenticator
 from CV import CV
 from Density import DensityAuth
+
 
 import data_manip
 
@@ -18,7 +19,7 @@ class TestAuth(Authenticator):
 
 
 if __name__=='__main__':
-
+    """
     test_data = {'a' : [coll.defaultdict(list, {'aa' : range(10,100,10),
                                                 'ab' : range(1,10)}),
                         coll.defaultdict(list, {'ac' : range(1,10,2),
@@ -31,6 +32,8 @@ if __name__=='__main__':
                         coll.defaultdict(list, {'bd' : range(50,300,150)})
                     ],
     }
+    """
+    test_data = pp.split_samples(pp.load_data())
 
     test_cv = CV(DensityAuth, test_data)
     '''
@@ -41,3 +44,4 @@ if __name__=='__main__':
 
     for i in test_cv.validate():
         pass
+    print "DONESKI"
