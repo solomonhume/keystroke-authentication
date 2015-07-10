@@ -41,8 +41,8 @@ def evaluate_threshold(threshold, scores):
 
 def compute_best_threshold(scores, loss):
     '''
-    takes [(score, 1|0)] and function
-    loss(ipr, frr, gt, it)
+    takes [(score, 1|0)] and 
+    function loss(ipr, frr, gt, it)
     chooses the best score in the list to
     minimize result of loss
 

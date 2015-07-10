@@ -39,7 +39,6 @@ class CV(object):
 
     def validate(self):
         '''
-        takes (username -> [(n-graph -> [latencies])])
         returns a list of results from several partitions of the data
         '''
         for partition in itertools.product(
@@ -50,4 +49,4 @@ class CV(object):
             val = {x[0]:x[2] for x in list(partition)}
 
             self.auth.train(train)
-            yield self.auth.evaluate(val)
+            yield self.auth.evaluate(train), self.auth.evaluate(val)
