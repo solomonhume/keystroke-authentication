@@ -36,17 +36,14 @@ class CV(object):
         ):
             train = {x[0]:x[1] for x in list(partition)}
             val = {x[0]:x[2] for x in list(partition)}
-
             for inner_part in itertools.product(
                     *[partition_data(u, train[u], self.k[u])
                       for u in self.data.keys()]
             ):
-                print 'fuck'
+                inner_train = {x[0]:x[1] for  in list(inner_part)}
+                inner_val = {x[1]:x[2] for  in list(inner_part)}
+                self.auth.estimate_model(inner_train, inner_val)
+                self.auth.score(inner_val)
+            self.auth.estimate_model(train,val)
 
-
-
-            '''
-
-            self.auth.train(train)
             yield self.auth.evaluate(train), self.auth.evaluate(val)
-            '''
