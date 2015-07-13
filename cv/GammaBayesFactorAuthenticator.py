@@ -19,7 +19,8 @@ class GammaBFAuth(Authenticator):
         self.loss = lambda ipr, frr, gt, it: ipr+frr
         self.scores = {}
 
-    def estimate_model(self, training_data):
+
+    def estimate_model(self, training_data, val_data):
         self.params = process_latencies(to_lat_dict(training_data),
                                         lambda x: stats.gamma.fit(
                                             x, floc=0),
@@ -27,14 +28,20 @@ class GammaBFAuth(Authenticator):
         )
 
 
-    def inner_validation(self, training_data, inner_val_data):
-        self.estimate_model(training_data)
-        new_scores = self.score(inner_val_data)
+    def score(self, val_data):
+        new_bfs = compute_bayesfactors(
+            compute_likelihoods(self.params, val_data)
+        )
         if self.scores == {}:
-            self.scores = new_scores
+            self.scores = new_bfs
         else:
-            for u in new_scores.keys():
-                self.scores[u].extend(new_scores[u])
+            for u in new_bfs.keys():
+                self.scores[u].extend(new_bfs[u])
+
+
+    def compute_threshold(self):
+        for u in scores.keys():
+            thresh[u] = compute_best_threshold(scores[u], self.loss)
 
 
     def train(self, training_data, inner_val_data):
@@ -47,13 +54,8 @@ class GammaBFAuth(Authenticator):
             self.thresh[u] = compute_best_threshold(scores[u], self.loss)
 
 
-    def score(self, val_data):
-        return compute_bayesfactors(compute_likelihoods(self.params, val_data))
-
-
     def evaluate(self, val_data):
         vbf_dict = self.score(val_data)
-        #vbf_dict = compute_bayesfactors(compute_likelihoods(self.params, val_data))
         results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
         return results
 
