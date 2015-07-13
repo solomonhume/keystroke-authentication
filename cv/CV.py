@@ -1,5 +1,5 @@
 import itertools
-
+import scipy as sp
 from Authenticator import Authenticator
 from Density import DensityAuth
 
@@ -8,7 +8,7 @@ class CV(object):
     implements truncated leave-p-out CV
     '''
 
-    def __init__(self, auth, data):
+    def __init__(self, auth, data, p):
         '''
         takes a dictionary (username -> [(ngraph -> [latencies])])
         username maps to list of samples (1k keystrokes) represented
@@ -17,8 +17,7 @@ class CV(object):
         '''
         self.data = data
         self.auth = auth()
-        self.p = {u:(1 if len(data[u]) > 30 else 2) for u in data.keys()}
-
+        self.p = p
 
     def partition_data(self, u, samples, p):
         '''
@@ -39,14 +38,13 @@ class CV(object):
 
     def validate(self):
         '''
+        takes (username -> [(n-graph -> [latencies])])
         returns a list of results from several partitions of the data
         '''
-        for partition in itertools.product(
-                *[self.partition_data(u, self.data[u], self.p[u])
-                for u in self.data.keys()]
-        ):
-            train = {x[0]:x[1] for x in list(partition)}
-            val = {x[0]:x[2] for x in list(partition)}
+        for u in self.data.keys():
+            for partition in self.partition_data(u, self.data[u], self.p[u]):
+                train = partition[1]
+                val = partition[2]
 
-            self.auth.train(train)
-            yield self.auth.evaluate(train), self.auth.evaluate(val)
+                self.auth.train(train)
+                yield self.auth.evaluate(val)
