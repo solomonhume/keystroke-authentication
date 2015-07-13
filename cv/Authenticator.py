@@ -54,4 +54,4 @@ def compute_best_threshold(scores, loss):
         if new_l < best_loss:
             best_loss = new_l
             best_score = t[0]
-    return t[0]
+    return best_score
