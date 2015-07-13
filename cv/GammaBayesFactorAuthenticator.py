@@ -13,11 +13,11 @@ from gamma_auth import compute_bayesfactors, compute_likelihoods
 
 
 class GammaBFAuth(Authenticator):
-    def __init__(self,kd):
+    def __init__(self):
         self.params = {}
         self.thresh = {}
         self.loss = lambda ipr, frr, gt, it: ipr+frr
-        self.kd = kd
+        self.scores = {}
 
     def estimate_model(self, training_data):
         self.params = process_latencies(to_lat_dict(training_data),
@@ -27,22 +27,20 @@ class GammaBFAuth(Authenticator):
         )
 
 
-    def train(self, training_data):
+    def inner_validation(self, training_data, inner_val_data):
+        self.estimate_model(training_data)
+        new_scores = self.score(inner_val_data)
+        if self.scores == {}:
+            self.scores = new_scores
+        else:
+            for u in new_scores.keys():
+                self.scores[u].extend(new_scores[u])
+
+
+    def train(self, training_data, inner_val_data):
         #ll_dict = compute_likelihoods(self.params, training_data)
         #bf_dict = compute_bayesfactors(ll_dict)
-        print 'training'
         scores = {u:[] for u in training_data.keys()}
-        for partition in itertools.product(
-                *[partition_data(u, training_data[u], self.kd[u])
-                  for u in training_data.keys()]
-        ):
-            print 'inner val'
-            train = {x[0]:x[1] for x in list(partition)}
-            val = {x[0]:x[2] for x in list(partition)}
-            
-            self.estimate_model(train)
-            new_scores = self.score(val)
-            for u in new_scores.keys(): scores[u].extend(new_scores[u])
 
         print 'threshold computation'
         for u in scores.keys():

@@ -44,7 +44,6 @@ class CV(object):
                 print 'fuck'
 
 
-
             '''
 
             self.auth.train(train)
