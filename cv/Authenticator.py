@@ -38,6 +38,10 @@ class Authenticator(object):
     def compute_threshold(self):
         pass
 
+    @abstractmethod    
+    def score(self, inner_val):
+        pass
+
     @abstractmethod
     def evaluate(self, val_data):
         pass

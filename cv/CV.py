@@ -18,8 +18,8 @@ class CV(object):
         '''
         self.data = data
 
-        self.k = {k:v[1] for k,v in pkd.items()}
         self.pkd = pkd
+        self.k = {k:v[1] for k,v in pkd.items()}
         self.p = {k:v[0] for k,v in pkd.items()}
 
         self.auth = auth(self.k)
@@ -45,5 +45,5 @@ class CV(object):
                 self.auth.estimate_model(inner_train, inner_val)
                 self.auth.score(inner_val)
             self.auth.estimate_model(train,val)
-
+            self.auth.compute_threshold()
             yield self.auth.evaluate(train), self.auth.evaluate(val)
