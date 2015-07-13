@@ -44,16 +44,6 @@ class GammaBFAuth(Authenticator):
             thresh[u] = compute_best_threshold(scores[u], self.loss)
 
 
-    def train(self, training_data, inner_val_data):
-        #ll_dict = compute_likelihoods(self.params, training_data)
-        #bf_dict = compute_bayesfactors(ll_dict)
-        scores = {u:[] for u in training_data.keys()}
-
-        print 'threshold computation'
-        for u in scores.keys():
-            self.thresh[u] = compute_best_threshold(scores[u], self.loss)
-
-
     def evaluate(self, val_data):
         vbf_dict = self.score(val_data)
         results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
