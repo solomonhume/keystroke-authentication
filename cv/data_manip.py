@@ -1,4 +1,5 @@
 import collections as coll
+import itertools
 
 import scipy.stats as stats
 
@@ -46,3 +47,20 @@ def process_latencies(lat_dict, proc, default):
         for ng in lat_dict[u].keys():
             p_lat[u][ng] = proc(lat_dict[u][ng])
     return p_lat
+
+
+def partition_data(u, samples, p):
+    '''
+    takes a username and list of dictionaries [(n-graph -> [latencies])]
+    generates partitions l1, l2 [(n-graph -> [latencies])]
+    so that len(l2) = p
+    and returns u, l1, l2
+    '''
+    sample_numbers = xrange(len(samples))
+    for leftout_ind in itertools.combinations(sample_numbers,p):
+        val_samples = [ samples[i]
+                        for i in list(leftout_ind) ]
+        train_samples = [ samples[i]
+                          for i in sample_numbers
+                          if not i in list(leftout_ind) ]
+        yield u, train_samples, val_samples

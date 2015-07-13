@@ -6,7 +6,7 @@ import scipy.misc as misc
 DATA_DIR = './combine'
 FILE_LS = next(os.walk(DATA_DIR))[-1]
 
-OUTER_GT = 10000
+OUTER_GT = 100
 INNER_GT = 100
 
 def load_data(ng_len=2, lat_lb=20, lat_ub=500):
@@ -110,4 +110,4 @@ if __name__=='__main__':
     d = split_samples(load_data())
     f, pkd = filter_users_val(d)
     print len(d.keys())
-    for x in pkd.items(): print x
+    for k,x in pkd.items(): print k, x[0], x[1], x[2]/x[0], x[3]/x[1]
