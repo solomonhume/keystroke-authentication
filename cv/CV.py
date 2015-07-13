@@ -30,7 +30,6 @@ class CV(object):
         takes (username -> [(n-graph -> [latencies])])
         returns a list of results from several partitions of the data
         '''
-<<<<<<< HEAD
         for partition in itertools.product(
                 *[partition_data(u, self.data[u], self.p[u])
                 for u in self.data.keys()]
