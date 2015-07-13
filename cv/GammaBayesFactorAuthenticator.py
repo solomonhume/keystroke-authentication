@@ -13,13 +13,14 @@ from gamma_auth import compute_bayesfactors, compute_likelihoods
 
 
 class GammaBFAuth(Authenticator):
-    def __init__(self,kd):
+    def __init__(self):
         self.params = {}
         self.thresh = {}
         self.loss = lambda ipr, frr, gt, it: ipr+frr
-        self.kd = kd
+        self.scores = {}
 
-    def estimate_model(self, training_data):
+
+    def estimate_model(self, training_data, val_data):
         self.params = process_latencies(to_lat_dict(training_data),
                                         lambda x: stats.gamma.fit(
                                             x, floc=0),
@@ -27,35 +28,34 @@ class GammaBFAuth(Authenticator):
         )
 
 
-    def train(self, training_data):
+    def score(self, val_data):
+        new_bfs = compute_bayesfactors(
+            compute_likelihoods(self.params, val_data)
+        )
+        if self.scores == {}:
+            self.scores = new_bfs
+        else:
+            for u in new_bfs.keys():
+                self.scores[u].extend(new_bfs[u])
+
+
+    def compute_threshold(self):
+        for u in scores.keys():
+            thresh[u] = compute_best_threshold(scores[u], self.loss)
+
+
+    def train(self, training_data, inner_val_data):
         #ll_dict = compute_likelihoods(self.params, training_data)
         #bf_dict = compute_bayesfactors(ll_dict)
-        print 'training'
         scores = {u:[] for u in training_data.keys()}
-        for partition in itertools.product(
-                *[partition_data(u, training_data[u], self.kd[u])
-                  for u in training_data.keys()]
-        ):
-            print 'inner val'
-            train = {x[0]:x[1] for x in list(partition)}
-            val = {x[0]:x[2] for x in list(partition)}
-            
-            self.estimate_model(train)
-            new_scores = self.score(val)
-            for u in new_scores.keys(): scores[u].extend(new_scores[u])
 
         print 'threshold computation'
         for u in scores.keys():
             self.thresh[u] = compute_best_threshold(scores[u], self.loss)
 
 
-    def score(self, val_data):
-        return compute_bayesfactors(compute_likelihoods(self.params, val_data))
-
-
     def evaluate(self, val_data):
         vbf_dict = self.score(val_data)
-        #vbf_dict = compute_bayesfactors(compute_likelihoods(self.params, val_data))
         results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
         return results
 

@@ -21,8 +21,9 @@ class CV(object):
         self.pkd = pkd
         self.k = {k:v[1] for k,v in pkd.items()}
         self.p = {k:v[0] for k,v in pkd.items()}
+        self.k = {k:v[1] for k,v in pkd.items()}
 
-        self.auth = auth(self.k)
+        self.auth = auth()
 
 
     def validate(self):
@@ -34,14 +35,16 @@ class CV(object):
                 *[partition_data(u, self.data[u], self.p[u])
                 for u in self.data.keys()]
         ):
+            print 'OUTER VAL'
             train = {x[0]:x[1] for x in list(partition)}
             val = {x[0]:x[2] for x in list(partition)}
             for inner_part in itertools.product(
                     *[partition_data(u, train[u], self.k[u])
-                      for u in self.data.keys()]
+                      for u in train.keys()]
             ):
-                inner_train = {x[0]:x[1] for  in list(inner_part)}
-                inner_val = {x[1]:x[2] for  in list(inner_part)}
+                print 'INNER VAL'
+                inner_train = {x[0]:x[1] for x in list(inner_part)}
+                inner_val = {x[0]:x[2] for x in list(inner_part)}
                 self.auth.estimate_model(inner_train, inner_val)
                 self.auth.score(inner_val)
             self.auth.estimate_model(train,val)
