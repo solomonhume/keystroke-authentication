@@ -12,7 +12,7 @@ class Authenticator(object):
         takes a dict {user -> [{ngraph -> [latency]}]}
         and a dict {user -> (k (int)}
         returns {user -> [ (score, 1|0) ]}
-        
+
         loops over leave-k-out partitions of each user's data
 
         scores = {u:[] for u in training_data.keys()}
@@ -23,7 +23,7 @@ class Authenticator(object):
             print 'inner val'
             train = {x[0]:x[1] for x in list(partition)}
             val = {x[0]:x[2] for x in list(partition)}
-            
+
             self.estimate_model(train)
             new_scores = self.score(val)
             for u in new_scores.keys(): scores[u].extend(new_scores[u])
@@ -31,7 +31,11 @@ class Authenticator(object):
         return scores
     '''
     @abstractmethod
-    def train(self, training_data):
+    def estimate_model(self, training_data, val_data):
+        pass
+
+    @abstractmethod
+    def compute_threshold(self):
         pass
 
     @abstractmethod
@@ -66,7 +70,7 @@ def evaluate_threshold(threshold, scores):
 
 def compute_best_threshold(scores, loss):
     '''
-    takes [(score, 1|0)] and 
+    takes [(score, 1|0)] and
     function loss(ipr, frr, gt, it)
     chooses the best score in the list to
     minimize result of loss
