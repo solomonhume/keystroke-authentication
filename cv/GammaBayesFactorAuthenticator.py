@@ -19,6 +19,7 @@ class GammaBFAuth(Authenticator):
 
     def train(self, training_data):
         print strftime("%H:%M:%S"), '- training'
+        
         print strftime("%H:%M:%S"), '- estimating parameters'
         self.params = process_latencies(to_lat_dict(training_data),
                                         lambda x: stats.gamma.fit(
@@ -27,10 +28,14 @@ class GammaBFAuth(Authenticator):
         )
         
         print strftime("%H:%M:%S"), '- computing Bayes factors'
-        bf_dict = compute_bayesfactors(compute_likelihoods(self.params, training_data))
+        ll_dict = compute_likelihoods(self.params, training_data)
+        bf_dict = compute_bayesfactors(ll_dict)
+        
         print strftime("%H:%M:%S"), '- computing thresholds'
         for u in bf_dict.keys():
             self.thresh[u] = compute_best_threshold(bf_dict[u], self.loss)
+
+        return bf_dict, ll_dict
 
 
     def evaluate(self, val_data):
@@ -49,16 +54,18 @@ if __name__=='__main__':
     all_data = split_samples(load_data())
 
     for u in all_data.keys():
-        if u not in ['ADcoiffaav',
+        if u not in [#'ADcoiffaav',
                      '1227981',
                      'ADcavek',
+                '''
                      'ADlyndak',
                      '1714733',
                      'ADshortnj',
                      'ADupperjk',
                      'ADabongofo',
                      'ADjiewang',
-                     'ADmarsala']:
+                     'ADmarsala' '''
+                ]:
             del all_data[u]
 
     gbfa = CV(GammaBFAuth, all_data)

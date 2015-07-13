@@ -11,13 +11,13 @@ def log_gamma_likelihood(g_param, data):
     '''
     if data == []: 
         return 0.
-    if g_param[0] > 0 and g_param[2] > 0:
-        return sum([stats.gamma.logpdf(x, 
-                                       g_param[0], 
-                                       scale=g_param[2], 
-                                       loc=0) 
-                    for x in data])
-    return (P.np.log(1.) - P.np.log(480.))
+    if P.np.isnan(g_param[0]) or P.np.isnan(g_param[2]) or g_param[0] < 0:
+        return P.np.log(1.) - P.np.log(480.)
+    return sum([stats.gamma.logpdf(x, 
+                                   g_param[0], 
+                                   scale=g_param[2], 
+                                   loc=0) 
+                for x in data])
 
 
 def lat_dict2loglikelihood(lat_dict, param):

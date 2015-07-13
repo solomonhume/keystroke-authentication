@@ -1,9 +1,13 @@
 import collections as coll
 import os
 
+import scipy.misc as misc
+
 DATA_DIR = './combine'
 FILE_LS = next(os.walk(DATA_DIR))[-1]
 
+OUTER_GT = 10000
+INNER_GT = 100
 
 def load_data(ng_len=2, lat_lb=20, lat_ub=500):
     '''
@@ -64,8 +68,46 @@ def split_samples(data_dict, sample_size=1000):
     return {k:map(ngraph_ls2dict,chunkify(v,sample_size)) for k,v in data_dict.items()}
 
 
+def filter_users_val(sample_dict):
+    '''
+    takes dict (user str -> [(ngraph -> [latency])])
+    returns a dict of the same type so that
+    only users who can supply the necessary amount of 
+    inner/outer genuine validation tests are kept.
+    also returns dict containing values of p for each user
+    (i.e. leave-p-out per outer validation split)
+    and dict containing values of k for each users
+    (i.e. leave-k-out per inner validation split)
+
+    could reduce N loop to ceil(N/2), cache comb approximations
+    '''
+    pk_combs_d = {}
+    for u in sample_dict.keys():
+        N = len(sample_dict[u])
+        # find min i so that i*C(N,i) >= OUTER_GT
+        for i in range(1,N):
+            if i*misc.comb(N,i) >= OUTER_GT:
+                pk_combs_d[u] = i
+                break
+        else:
+            continue
+        
+        p = pk_combs_d[u]
+        # find min i so that i*C(N-p,i) >= INNER_GT
+        for i in range(1,N-p):
+            if i*misc.comb(N-p, i) >= INNER_GT:
+                pk_combs_d[u] = (p, i, p*misc.comb(N,p), i*misc.comb(N-p,i))
+                break
+        else:
+            del pk_combs_d[u]
+    for u in [x for x in sample_dict.keys() if not x in pk_combs_d.keys()]:
+        del sample_dict[u]
+    assert set(sample_dict.keys()) == set(pk_combs_d.keys())
+    return sample_dict, pk_combs_d
+    
+
 if __name__=='__main__':
     d = split_samples(load_data())
-    print len(d)
-    #print len(d['1227981'])
-    #print d['1227981'][0]['TH'][:10]
+    f, pkd = filter_users_val(d)
+    print len(d.keys())
+    for x in pkd.items(): print x
