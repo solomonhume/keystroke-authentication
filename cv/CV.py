@@ -41,7 +41,7 @@ class CV(object):
                     *[partition_data(u, train[u], self.k[u])
                       for u in train.keys()]
             ):
-                print 'INNER VAL'
+                #print 'INNER VAL'
                 inner_train = {x[0]:x[1] for x in list(inner_part)}
                 inner_val = {x[0]:x[2] for x in list(inner_part)}
                 self.auth.estimate_model(inner_train, inner_val)
