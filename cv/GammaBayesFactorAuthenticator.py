@@ -27,7 +27,6 @@ class GammaBFAuth(Authenticator):
                                         lambda: (-1.,-1.,-1.)
         )
 
-
     def score(self, val_data):
         new_bfs = compute_bayesfactors(
             compute_likelihoods(self.params, val_data)
@@ -38,21 +37,9 @@ class GammaBFAuth(Authenticator):
             for u in new_bfs.keys():
                 self.scores[u].extend(new_bfs[u])
 
-
     def compute_threshold(self):
         for u in scores.keys():
             thresh[u] = compute_best_threshold(scores[u], self.loss)
-
-
-    def train(self, training_data, inner_val_data):
-        #ll_dict = compute_likelihoods(self.params, training_data)
-        #bf_dict = compute_bayesfactors(ll_dict)
-        scores = {u:[] for u in training_data.keys()}
-
-        print 'threshold computation'
-        for u in scores.keys():
-            self.thresh[u] = compute_best_threshold(scores[u], self.loss)
-
 
     def evaluate(self, val_data):
         vbf_dict = self.score(val_data)
@@ -78,15 +65,15 @@ if __name__=='__main__':
 
     with open('./bf_result.csv', 'rw+') as res_file:
         result_writer = csv.writer(res_file)
-        
+
         for n,i in enumerate(gbfa.validate()):
             train_res, cv_res = i
-            result_writer.writerow(['user', 
-                                    'train_IPR', 'train_FRR', 'train_GT', 'train_IT', 
+            result_writer.writerow(['user',
+                                    'train_IPR', 'train_FRR', 'train_GT', 'train_IT',
                                     'CV_IPR', 'CV_FRR', 'CV_GT', 'CV_IT'])
-            for u in train_res.keys(): 
-                result_writer.writerow([u] + 
-                                       list(train_res[u]) + 
+            for u in train_res.keys():
+                result_writer.writerow([u] +
+                                       list(train_res[u]) +
                                        list(cv_res[u]))
             result_writer.writerow([])
             print strftime("%H:%M:%S"), '- finished validation', n

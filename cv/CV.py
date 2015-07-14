@@ -19,7 +19,6 @@ class CV(object):
         self.data = data
 
         self.pkd = pkd
-        self.k = {k:v[1] for k,v in pkd.items()}
         self.p = {k:v[0] for k,v in pkd.items()}
         self.k = {k:v[1] for k,v in pkd.items()}
 
