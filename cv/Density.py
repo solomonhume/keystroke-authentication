@@ -22,10 +22,10 @@ class DensityAuth(Authenticator):
     def score(self,inner_val):
         new_dd = density_scoring(self.inn_train_model,self.inn_val_model)
         if self.scores == {}:
-            self.scores = new_bfs
+            self.scores = new_dd
         else:
-            for u in new_bfs.keys():
-                self.scores[u].extend(new_bfs[u])
+            for u in new_dd.keys():
+                self.scores[u].extend(new_dd[u])
 
     def compute_threshold(self):
         for u in scores.keys():
@@ -50,3 +50,18 @@ if __name__ == '__main__':
     test_cv = CV(DensityAuth, test_data,pkd)
     for i in test_cv.validate():
         print "fuck"
+
+    with open('./bf_result.csv', 'rw+') as res_file:
+        result_writer = csv.writer(res_file)
+
+        for n,i in enumerate(gbfa.validate()):
+            train_res, cv_res = i
+            result_writer.writerow(['user',
+                                    'train_IPR', 'train_FRR', 'train_GT', 'train_IT',
+                                    'CV_IPR', 'CV_FRR', 'CV_GT', 'CV_IT'])
+            for u in train_res.keys():
+                result_writer.writerow([u] +
+                                       list(train_res[u]) +
+                                       list(cv_res[u]))
+            result_writer.writerow([])
+            print strftime("%H:%M:%S"), '- finished validation', n

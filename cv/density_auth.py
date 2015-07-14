@@ -12,6 +12,8 @@ def kdensity(data):
         kde.fit(bw=nrd0(temp))
         d = kde.evaluate(range(501))
         return d
+    else:
+        return 0
 
 def nrd0(x):
     """
@@ -47,7 +49,6 @@ def density_scoring(train,val):
                     ( difference(train[u],val[u]),
                       int(u==current_user) )
                 )
-    print d_dict
     return d_dict
 
 def difference(prof1,prof2):
