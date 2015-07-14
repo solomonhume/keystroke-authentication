@@ -147,7 +147,7 @@ for useNum,udia,utime in zip(range(len(userDia)),userDia,userTime):
         trainData = clist[:l]
         testData = clist[l:]
         combo2 = list(itertools.islice(itertools.combinations(trainData,l-2),10))
-        for c in clist:
+        for c in testData:
             for s,a in zip(c[0],c[1]):
                 testingProf = orgDiagraph(testingProf,s,a)
         for dig,val in testingProf.items():
