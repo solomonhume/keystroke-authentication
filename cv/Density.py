@@ -2,10 +2,12 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import stats
 import itertools
+import sys
+import csv
 
 from Authenticator import Authenticator, compute_best_threshold
 from data_manip import to_lat_dict, process_latencies
-from density_auth import kdensity,determineThresh,evaluateThresh,density_scoring
+from density_auth import kdensity,density_scoring
 
 
 class DensityAuth(Authenticator):
@@ -17,7 +19,9 @@ class DensityAuth(Authenticator):
     def estimate_model(self,inner_train,inner_val):
         self.inn_train_model = process_latencies(
                                 to_lat_dict(inner_train),kdensity,lambda: 0)
+        print "train model complete"
         self.inn_val_model = process_latencies(to_lat_dict(inner_val),kdensity,lambda: 0)
+        print
 
     def score(self,inner_val):
         new_dd = density_scoring(self.inn_train_model,self.inn_val_model)
@@ -42,19 +46,21 @@ if __name__ == '__main__':
     from CV import CV
 
     test_data,pkd = filter_users_val(split_samples(load_data()))
+    """
     for u in test_data.keys():
         if u not in {'1227981','ADabongofo'}:
             del test_data[u]
             del pkd[u]
+    """
     print test_data.keys()
     test_cv = CV(DensityAuth, test_data,pkd)
     for i in test_cv.validate():
-        print "fuck"
+        pass
 
-    with open('./bf_result.csv', 'rw+') as res_file:
-        result_writer = csv.writer(res_file)
+    with open('./kde_result.csv', 'rw+') as outfile:
+        result_writer = csv.writer(outfile)
 
-        for n,i in enumerate(gbfa.validate()):
+        for n,i in enumerate(test_cv.validate()):
             train_res, cv_res = i
             result_writer.writerow(['user',
                                     'train_IPR', 'train_FRR', 'train_GT', 'train_IT',
