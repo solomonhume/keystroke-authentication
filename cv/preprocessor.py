@@ -1,7 +1,10 @@
 import collections as coll
+import itertools
 import os
 
 import scipy.misc as misc
+
+from data_manip import partition_data
 
 DATA_DIR = './combine'
 FILE_LS = next(os.walk(DATA_DIR))[-1]
@@ -109,4 +112,41 @@ if __name__=='__main__':
     d = split_samples(load_data())
     f, pkd = filter_users_val(d)
     print len(d.keys())
-    for k,x in pkd.items(): print k, x[0], x[1], x[2]/x[0], x[3]/x[1]
+    print 'user,', 'p,', 'k,', 'outer combinations,', 'inner combinations,'
+    for k,x in pkd.items(): 
+        print k, ',', x[0], ',', x[1], ',', int(x[2]/x[0]), ',', int(x[3]/x[1])
+        
+    print ((pkd['1227981'][2]/pkd['1227981'][0])*
+           (pkd['1227981'][3]/pkd['1227981'][1])*
+           (pkd['9999999'][2]/pkd['9999999'][0])*
+           (pkd['9999999'][3]/pkd['9999999'][1])
+    )
+    for u in f.keys():
+        if not u in ['1227981', '9999999']:
+            del f[u]
+    data = f
+    p = {u:int(pkd[u][0]) for u in ['1227981', '9999999']}
+    k = {u:int(pkd[u][1]) for u in ['1227981', '9999999']}
+    i1 = itertools.product(
+        *[partition_data(u, data[u], p[u])
+          for u in ['1227981', '9999999']]
+    )
+    lli1 = len(list(i1))
+    i1 = itertools.product(
+        *[partition_data(u, data[u], p[u])
+          for u in ['1227981', '9999999']]
+    )
+
+    for i in i1:
+        train = {x[0]:x[1] for x in list(i)}
+
+        i2 = itertools.product(
+            *[partition_data(u, train[u], k[u])
+              for u in ['1227981', '9999999']]
+        )
+        lli2 = len(list(i2))
+        break
+    
+    print lli1, lli2
+    print lli1*lli2
+

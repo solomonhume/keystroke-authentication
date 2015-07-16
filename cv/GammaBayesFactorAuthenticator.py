@@ -43,7 +43,8 @@ class GammaBFAuth(Authenticator):
 
 
     def evaluate(self, val_data):
-        #vbf_dict = self.score(val_data)
+        self.scores = {}
+        self.score(val_data)
         vbf_dict = self.scores
         results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
         return results

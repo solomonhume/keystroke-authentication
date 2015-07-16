@@ -1,5 +1,5 @@
 import itertools
-import scipy as sp
+
 from Authenticator import Authenticator
 from data_manip import partition_data
 
