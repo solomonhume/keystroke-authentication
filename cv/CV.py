@@ -48,3 +48,4 @@ class CV(object):
             self.auth.estimate_model(train,val)
             self.auth.compute_threshold()
             yield self.auth.evaluate(train), self.auth.evaluate(val)
+            self.auth.scores = {}
