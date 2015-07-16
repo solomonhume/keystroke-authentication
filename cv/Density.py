@@ -2,8 +2,7 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import stats
 import itertools
-import sys
-import csv
+import time
 
 from Authenticator import Authenticator, compute_best_threshold
 from data_manip import to_lat_dict, process_latencies
@@ -19,9 +18,7 @@ class DensityAuth(Authenticator):
     def estimate_model(self,inner_train,inner_val):
         self.inn_train_model = process_latencies(
                                 to_lat_dict(inner_train),kdensity,lambda: 0)
-        print "train model complete"
         self.inn_val_model = process_latencies(to_lat_dict(inner_val),kdensity,lambda: 0)
-        print
 
     def score(self,inner_val):
         new_dd = density_scoring(self.inn_train_model,self.inn_val_model)
@@ -32,8 +29,8 @@ class DensityAuth(Authenticator):
                 self.scores[u].extend(new_dd[u])
 
     def compute_threshold(self):
-        for u in scores.keys():
-            self.thresh[u] = compute_best_threshold(scoers[u])
+        for u in self.scores.keys():
+            self.thresh[u] = compute_best_threshold(self.scores[u],self.loss)
 
     def evaluate(self,val_data,training_data):
             score_dict = self.score(val_data)
@@ -44,6 +41,12 @@ class DensityAuth(Authenticator):
 if __name__ == '__main__':
     from preprocessor import split_samples, load_data, filter_users_val
     from CV import CV
+    import sys
+    import csv
+    import os
+
+    start_time = time.time()
+    print start_time, 'initializing algorithm'
 
     test_data,pkd = filter_users_val(split_samples(load_data()))
     """
@@ -54,9 +57,6 @@ if __name__ == '__main__':
     """
     print test_data.keys()
     test_cv = CV(DensityAuth, test_data,pkd)
-    for i in test_cv.validate():
-        pass
-
     with open('./kde_result.csv', 'rw+') as outfile:
         result_writer = csv.writer(outfile)
 
@@ -70,4 +70,4 @@ if __name__ == '__main__':
                                        list(train_res[u]) +
                                        list(cv_res[u]))
             result_writer.writerow([])
-            print strftime("%H:%M:%S"), '- finished validation', n
+            print start_time-time.time(), '- finished validation', n

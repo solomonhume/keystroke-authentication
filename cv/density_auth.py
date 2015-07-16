@@ -6,10 +6,9 @@ def kdensity(data):
     """
     calculate the kernel density for a ngraph -> [latencies]
     """
-    temp = np.array(data)
-    if len(temp)>2:
-        kde = sm.nonparametric.KDEUnivariate(temp.astype(float))
-        kde.fit(bw=nrd0(temp))
+    if len(data)>2:
+        kde = sm.nonparametric.KDEUnivariate(data)
+        kde.fit(bw=nrd0(data))
         d = kde.evaluate(range(501))
         return d
     else:
