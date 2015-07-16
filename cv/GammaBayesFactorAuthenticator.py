@@ -38,12 +38,13 @@ class GammaBFAuth(Authenticator):
                 self.scores[u].extend(new_bfs[u])
 
     def compute_threshold(self):
-        for u in scores.keys():
-            thresh[u] = compute_best_threshold(scores[u], self.loss)
+        for u in self.scores.keys():
+            self.thresh[u] = compute_best_threshold(self.scores[u], self.loss)
 
 
     def evaluate(self, val_data):
-        vbf_dict = self.score(val_data)
+        #vbf_dict = self.score(val_data)
+        vbf_dict = self.scores
         results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
         return results
 
@@ -59,14 +60,12 @@ if __name__=='__main__':
         if not u in {'1227981', '9999999'}:
             del all_data[u]
             del pkd[u]
-    print all_data.keys()
-    print pkd.keys()
 
     gbfa = CV(GammaBFAuth, all_data, pkd)
 
     with open('./bf_result.csv', 'rw+') as res_file:
         result_writer = csv.writer(res_file)
-
+        print strftime("%H:%M:%S"), '- START'
         for n,i in enumerate(gbfa.validate()):
             train_res, cv_res = i
             result_writer.writerow(['user',

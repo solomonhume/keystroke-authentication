@@ -70,3 +70,22 @@ def compute_bayesfactors(ll_dict):
                  ll_dict[u][i][1]) 
             )
     return bf_dict
+
+
+def compute_bf_opt(ll_dict):
+    summed_likelihoods = [
+        misc.logsumexp(
+            [ll_dict[u][i] for u in ll_dict.keys()]
+        ) 
+        for i in range(len(ll_dict.keys()))
+    ]
+    
+    bf_dict = {u:[] for u in ll_dict.keys()}
+    
+    for u in ll_dict.keys():
+        for i in range(len(ll_dict[u])):
+            l_genuine  = ll_dict[u][i][0]
+            l_impostor = misc.logsumexp(
+                summed_likelihoods[i],
+                l_genuine
+            )
