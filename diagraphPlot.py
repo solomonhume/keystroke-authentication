@@ -31,6 +31,7 @@ filepaths, CUdata, allUsers =[], [], []
 dataPath = '/home/andrew/Documents/Research/keystroke-authentication/keystroke goats/filtered/' #location of formatted data files
 for root, dirs, files in os.walk(dataPath, topdown=False): #obtains all files/directories in designated directory
     for name in files:
+        if name in {'4486493.txt','ADzagrobs.txt'}
         filepaths.append(os.path.join(root,name)) #store paths to all files in directory
         namelist.append(name)
 filepaths.sort()

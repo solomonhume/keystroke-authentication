@@ -1,5 +1,4 @@
 import itertools
-import scipy as sp
 from Authenticator import Authenticator
 from data_manip import partition_data
 
@@ -34,12 +33,14 @@ class CV(object):
                 *[partition_data(u, self.data[u], self.p[u])
                 for u in self.data.keys()]
         ):
+            print 'OUTER VAL'
             train = {x[0]:x[1] for x in list(partition)}
             val = {x[0]:x[2] for x in list(partition)}
             for inner_part in itertools.product(
                     *[partition_data(u, train[u], self.k[u])
                       for u in train.keys()]
             ):
+                #print 'INNER VAL'
                 inner_train = {x[0]:x[1] for x in list(inner_part)}
                 inner_val = {x[0]:x[2] for x in list(inner_part)}
                 self.auth.estimate_model(inner_train, inner_val)
@@ -47,4 +48,3 @@ class CV(object):
             self.auth.estimate_model(train,val)
             self.auth.compute_threshold()
             yield self.auth.evaluate(train), self.auth.evaluate(val)
-            self.auth.scores = {}
