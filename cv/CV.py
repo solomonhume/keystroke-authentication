@@ -1,4 +1,5 @@
 import itertools
+
 from Authenticator import Authenticator
 from data_manip import partition_data
 
@@ -33,7 +34,6 @@ class CV(object):
                 *[partition_data(u, self.data[u], self.p[u])
                 for u in self.data.keys()]
         ):
-            print 'OUTER VAL'
             train = {x[0]:x[1] for x in list(partition)}
             val = {x[0]:x[2] for x in list(partition)}
             for inner_part in itertools.product(
@@ -49,3 +49,7 @@ class CV(object):
             self.auth.compute_threshold()
             yield self.auth.evaluate(train), self.auth.evaluate(val)
             self.auth.scores = {}
+    
+    def validate_user(self, u):
+        for partition in partition_data(u, self.data[u], self.p[u]):
+            yield partition

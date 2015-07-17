@@ -57,7 +57,7 @@ def ngraph_ls2dict(ls):
     d = coll.defaultdict(list)
     for ng_t in ls:
         if ng_t[0] in d: d[ng_t[0]].append(float(ng_t[1]))
-    else: d[ng_t[0]] = [float(ng_t[1])]
+        else: d[ng_t[0]] = [float(ng_t[1])]
     return d
 
 

@@ -13,11 +13,16 @@ from gamma_auth import compute_bayesfactors, compute_likelihoods
 
 
 class GammaBFAuth(Authenticator):
-    def __init__(self):
+    def __init__(self, all_data):
+        '''
+        takes all data to estimate initial parameters.
+        '''
         self.params = {}
         self.thresh = {}
         self.loss = lambda ipr, frr, gt, it: ipr+frr
         self.scores = {}
+        
+        self.estimate_model(all_data, None)
 
 
     def estimate_model(self, training_data, val_data):
@@ -37,6 +42,7 @@ class GammaBFAuth(Authenticator):
             for u in new_bfs.keys():
                 self.scores[u].extend(new_bfs[u])
 
+
     def compute_threshold(self):
         for u in self.scores.keys():
             self.thresh[u] = compute_best_threshold(self.scores[u], self.loss)
@@ -51,19 +57,26 @@ class GammaBFAuth(Authenticator):
 
 
 if __name__=='__main__':
+    from pprint import PrettyPrinter
+
     from CV import CV
     from preprocessor import split_samples, load_data, filter_users_val
 
     P.np.seterr(all='ignore')
+    pp = PrettyPrinter()
 
-    all_data, pkd = filter_users_val(split_samples(load_data()))
-    for u in all_data.keys():
-        if not u in {'1227981', '9999999'}:
-            del all_data[u]
-            del pkd[u]
+    all_data, pkd = filter_user_val(split_samples(load_data()))
+    print all_data['1227981']
 
-    gbfa = CV(GammaBFAuth, all_data, pkd)
+    gbfa = CV(lambda: GammaBFAuth(all_data), 
+              all_data, 
+              pkd)
 
+    u,train,val = next(gbfa.validate_user('ADabongofo'))
+    pp.pprint(u)
+    pp.pprint(train)
+    pp.pprint(val)
+    '''
     with open('./bf_result.csv', 'rw+') as res_file:
         result_writer = csv.writer(res_file)
         print strftime("%H:%M:%S"), '- START'
@@ -78,3 +91,5 @@ if __name__=='__main__':
                                        list(cv_res[u]))
             result_writer.writerow([])
             print strftime("%H:%M:%S"), '- finished validation', n
+    '''
+
