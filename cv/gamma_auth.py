@@ -52,13 +52,13 @@ def compute_likelihoods(params, samples):
     return ll_dict
 
 
-def compute_bayesfactors(ll_dict):
+def compute_bayesfactors(ll_dict, user_ls=None):
     '''
     takes a dictionary {users -> [(likelihoods, 1|0 (genuine/impostor))]}
     returns a dictionary {users -> [(bayes factors, 1|0)]}
     '''
     bf_dict = {u:[] for u in ll_dict.keys()}
-    for u in ll_dict.keys():
+    for u in (ll_dict.keys() if (user_ls==None) else user_ls):
         for i in range(len(ll_dict[u])):
             impostor_lls = [ll_dict[impostor][i][0] 
                             for impostor in ll_dict.keys()
@@ -69,23 +69,45 @@ def compute_bayesfactors(ll_dict):
                 ((l_genuine-l_impostor), 
                  ll_dict[u][i][1]) 
             )
+    for u in bf_dict.keys():
+        if bf_dict[u] == []:
+            del bf_dict[u]
     return bf_dict
 
 
-def compute_bf_opt(ll_dict):
+def compute_bf_opt(ll_dict, user_ls=None):
     summed_likelihoods = [
         misc.logsumexp(
             [ll_dict[u][i] for u in ll_dict.keys()]
         ) 
-        for i in range(len(ll_dict.keys()))
+        for i in range(len(
+                ll_dict[ll_dict.keys()[0]]
+        ))
     ]
     
     bf_dict = {u:[] for u in ll_dict.keys()}
     
-    for u in ll_dict.keys():
+    for u in (ll_dict.keys() if (user_ls==None) else user_ls):
         for i in range(len(ll_dict[u])):
             l_genuine  = ll_dict[u][i][0]
-            l_impostor = misc.logsumexp(
+            l_impostor = logdiffexp(
                 summed_likelihoods[i],
                 l_genuine
             )
+            bf_dict[u].append(
+                ((l_genuine-l_impostor),
+                 ll_dict[u][i][1])
+            )
+    for u in bf_dict.keys():
+        if bf_dict[u] == []:
+            del bf_dict[u]
+    return bf_dict
+
+def logdiffexp(a,b):
+    '''
+    tries to compute 
+    log(exp(a) - exp(b))
+    in a numerically stable manner.
+    '''
+    c = max(a,b)
+    return P.np.log(P.np.exp(a-c) - P.np.exp(b-c)) + c

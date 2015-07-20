@@ -34,7 +34,7 @@ def load_data(ng_len=2, lat_lb=20, lat_ub=500):
         ngraphs = []
         for i in range(len(pairs)-ng_len):
             ng_t = (''.join([x[0] for x in pairs[i:i+ng_len]]),
-                        pairs[i+ng_len][1] - pairs[i][1])
+                        pairs[i+ng_len-1][1] - pairs[i][1])
             if lat_lb <= ng_t[1] <= lat_ub: ngraphs.append(ng_t)
         k = f[:-4] #the file name without extension (e.g. ".txt")
         d[k] = ngraphs

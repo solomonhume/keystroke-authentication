@@ -9,7 +9,7 @@ import scipy.stats as stats
 
 from Authenticator import Authenticator, compute_best_threshold, evaluate_threshold
 from data_manip import to_lat_dict, process_latencies, partition_data
-from gamma_auth import compute_bayesfactors, compute_likelihoods
+from gamma_auth import compute_bayesfactors, compute_bf_opt, compute_likelihoods
 
 
 class GammaBFAuth(Authenticator):
@@ -32,9 +32,25 @@ class GammaBFAuth(Authenticator):
                                         lambda: (-1.,-1.,-1.)
         )
 
-    def score(self, val_data):
-        new_bfs = compute_bayesfactors(
-            compute_likelihoods(self.params, val_data)
+
+    def update_model(self, training_data, user_ls):
+        '''
+        update parameters for users in user_ls
+        '''
+        filtered_data = {u:training_data[u] for u in user_ls}
+        new_param = process_latencies(to_lat_dict(filtered_data),
+                                        lambda x: stats.gamma.fit(
+                                            x, floc=0),
+                                        lambda: (-1., -1., -1.)
+        )
+        for u in user_ls:
+            self.params[u] = new_param[u]
+
+
+    def score(self, val_data, user_ls=None):
+        new_bfs = compute_bf_opt(
+            compute_likelihoods(self.params, val_data),
+            user_ls
         )
         if self.scores == {}:
             self.scores = new_bfs
@@ -48,11 +64,13 @@ class GammaBFAuth(Authenticator):
             self.thresh[u] = compute_best_threshold(self.scores[u], self.loss)
 
 
-    def evaluate(self, val_data):
+    def evaluate(self, val_data, user_ls=None):
         self.scores = {}
-        self.score(val_data)
+        self.score(val_data, user_ls)
         vbf_dict = self.scores
-        results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) for u in self.thresh.keys()}
+        results = {u:evaluate_threshold(self.thresh[u], vbf_dict[u]) 
+                   for u in (user_ls if (user_ls != None) 
+                             else self.thresh.keys())}
         return results
 
 
@@ -65,22 +83,22 @@ if __name__=='__main__':
     P.np.seterr(all='ignore')
     pp = PrettyPrinter()
 
-    all_data, pkd = filter_user_val(split_samples(load_data()))
-    print all_data['1227981']
+    all_data, pkd = filter_users_val(split_samples(load_data()))
+    '''
+    for u in all_data.keys():
+        if not u in ['1227981', '9999999']:
+            del all_data[u]
+            del pkd[u]
+    '''
 
     gbfa = CV(lambda: GammaBFAuth(all_data), 
               all_data, 
               pkd)
 
-    u,train,val = next(gbfa.validate_user('ADabongofo'))
-    pp.pprint(u)
-    pp.pprint(train)
-    pp.pprint(val)
-    '''
     with open('./bf_result.csv', 'rw+') as res_file:
         result_writer = csv.writer(res_file)
         print strftime("%H:%M:%S"), '- START'
-        for n,i in enumerate(gbfa.validate()):
+        for n,i in enumerate(gbfa.validate_user('1227981')):
             train_res, cv_res = i
             result_writer.writerow(['user',
                                     'train_IPR', 'train_FRR', 'train_GT', 'train_IT',
@@ -91,5 +109,3 @@ if __name__=='__main__':
                                        list(cv_res[u]))
             result_writer.writerow([])
             print strftime("%H:%M:%S"), '- finished validation', n
-    '''
-
