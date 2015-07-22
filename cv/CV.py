@@ -1,10 +1,9 @@
 import itertools
-from time import strftime
 
 import scipy.misc as misc
 
 from Authenticator import Authenticator
-from data_manip import partition_data
+from data_manip import partition_data, timestamp
 
 class CV(object):
     '''
@@ -43,7 +42,6 @@ class CV(object):
                     *[partition_data(u, train[u], self.k[u])
                       for u in train.keys()]
             ):
-                #print 'INNER VAL'
                 inner_train = {x[0]:x[1] for x in list(inner_part)}
                 inner_val = {x[0]:x[2] for x in list(inner_part)}
                 self.auth.estimate_model(inner_train, inner_val)
@@ -54,6 +52,7 @@ class CV(object):
             self.auth.scores = {}
     
     def validate_user(self, u):
+        timestamp('START validating user ' + u)
         # split the other user's data in half for training/validation
         # then just use these halves for all of the user's CV splits
         impostors = [x for x in self.data.keys() if x != u]
@@ -67,25 +66,35 @@ class CV(object):
 
             inner_val[x] = self.data[x][ self.p[x] : self.p[x]+self.k[x] ]
             inner_train[x] = self.data[x][ self.p[x]+self.k[x] : ]
-        print strftime("%H:%M:%S"), '- CONSTRUCTED IMPOSTOR SAMPLE DICTIONARIES'
+        timestamp('constructed impostor sample partitions')
 
-        #print 'outer loop has', sum(1 for _ in partition_data(u, self.data[u], self.p[u])), 'iterations'
         print 'outer loop iterations:', int(misc.comb(len(self.data[u]), self.p[u]))
         print 'inner loop iterations:', int(misc.comb(len(self.data[u])-self.p[u], self.k[u]))
 
         impostor_params = None
-        for part in partition_data(u, self.data[u], self.p[u]):
+        for n_outer, part in enumerate(partition_data(u, self.data[u], self.p[u])):
             # set the new partitions for this user
             outer_val[part[0]] = part[2]
             outer_train[part[0]] = part[1]
-            for n, inner_part in enumerate(partition_data(u, part[1], self.k[u])):
+            for n_inner, inner_part in enumerate(partition_data(u, part[1], self.k[u])):
                 inner_train[part[0]] = inner_part[1]
                 inner_val[part[0]] = inner_part[2]
                 
                 self.auth.update_model(inner_train, [u])
-                self.auth.score(inner_val, [u])
-                print strftime("%H:%M:%S"), '- finished inner loop iteration', n
+                if n_inner == 0 and n_outer == 0:
+                    self.auth.score(inner_val, [u])
+                    inner_ll = self.auth.ll_dict
+                else:
+                    self.auth.ll_dict = inner_ll
+                    self.auth.score(inner_val, [u], clear_cache=False)
+                if n_inner % 5 == 0:
+                    timestamp('finished inner loop iteration ' + str(n_inner))
             self.auth.compute_threshold()
+            timestamp('finished threshold computation')
             self.auth.estimate_model(outer_train, outer_val)
-            yield self.auth.evaluate(outer_train, user_ls=[u]), self.auth.evaluate(outer_val, user_ls=[u])
+            timestamp('finished final model estimation')
+
+            #yield self.auth.evaluate(outer_train, user_ls=[u]), self.auth.evaluate(outer_val, user_ls=[u])
+            yield self.auth.evaluate(outer_val, user_ls=[u])
+            timestamp('finished outer loop iteration' + str(n_outer))
             self.auth.scores = {}

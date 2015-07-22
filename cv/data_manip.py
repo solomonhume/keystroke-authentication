@@ -1,5 +1,6 @@
 import collections as coll
 import itertools
+from time import strftime
 
 import scipy.stats as stats
 
@@ -64,3 +65,6 @@ def partition_data(u, samples, p):
                           for i in sample_numbers
                           if not i in list(leftout_ind) ]
         yield u, train_samples, val_samples
+
+def timestamp(msg):
+    print strftime('%H:%M:%S'), '-', msg

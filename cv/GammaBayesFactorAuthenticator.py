@@ -1,7 +1,6 @@
 import collections as coll
 import csv
 import itertools
-from time import strftime
 import pprint
 
 import pylab as P
@@ -21,6 +20,7 @@ class GammaBFAuth(Authenticator):
         self.thresh = {}
         self.loss = lambda ipr, frr, gt, it: ipr+frr
         self.scores = {}
+        self.ll_dict = {}
         
         self.estimate_model(all_data, None)
 
@@ -47,11 +47,17 @@ class GammaBFAuth(Authenticator):
             self.params[u] = new_param[u]
 
 
-    def score(self, val_data, user_ls=None):
-        new_bfs = compute_bf_opt(
-            compute_likelihoods(self.params, val_data),
-            user_ls
-        )
+    def score(self, val_data, user_ls=None, clear_cache=True):
+        if clear_cache:
+            self.ll_dict = compute_likelihoods(self.params, val_data)
+        else:
+            updated_lls = compute_likelihoods(self.params, 
+                                              val_data,
+                                              user_ls
+            )
+            self.ll_dict[user_ls[0]] = updated_lls[user_ls[0]]
+
+        new_bfs = compute_bf_opt(self.ll_dict, user_ls)
         if self.scores == {}:
             self.scores = new_bfs
         else:
@@ -84,12 +90,12 @@ if __name__=='__main__':
     pp = PrettyPrinter()
 
     all_data, pkd = filter_users_val(split_samples(load_data()))
-    '''
+
     for u in all_data.keys():
-        if not u in ['1227981', '9999999']:
+        if all_data[u] == []:
             del all_data[u]
             del pkd[u]
-    '''
+
 
     gbfa = CV(lambda: GammaBFAuth(all_data), 
               all_data, 
@@ -97,15 +103,19 @@ if __name__=='__main__':
 
     with open('./bf_result.csv', 'rw+') as res_file:
         result_writer = csv.writer(res_file)
-        print strftime("%H:%M:%S"), '- START'
+        result_writer.writerow(['user',
+                                'CV_IPR', 'CV_FRR', 'CV_GT', 'CV_IT'])
+
         for n,i in enumerate(gbfa.validate_user('1227981')):
-            train_res, cv_res = i
+            cv_res = i
+            '''
             result_writer.writerow(['user',
                                     'train_IPR', 'train_FRR', 'train_GT', 'train_IT',
                                     'CV_IPR', 'CV_FRR', 'CV_GT', 'CV_IT'])
+
             for u in train_res.keys():
                 result_writer.writerow([u] +
                                        list(train_res[u]) +
                                        list(cv_res[u]))
-            result_writer.writerow([])
-            print strftime("%H:%M:%S"), '- finished validation', n
+            '''
+            result_writer.writerow(['1227981']+list(cv_res['1227981']))

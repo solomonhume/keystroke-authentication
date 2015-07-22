@@ -33,13 +33,15 @@ def lat_dict2loglikelihood(lat_dict, param):
                 for ng in lat_dict.keys()])
 
 
-def compute_likelihoods(params, samples):
+def compute_likelihoods(params, samples, user_ls=None):
     '''
     takes a dictionary {users -> {ngraphs -> parameters}}
     and a dictionary {users -> [{ngraphs -> [latency]}]}
     returns a dictionary {users -> [(likelihoods, 1|0 (genuine/impostor))]}
     '''
-    ll_dict = {u:[] for u in params.keys()}
+    ll_dict = {u:[] 
+               for u in (params.keys() if user_ls == None else user_ls)
+    }
     # user_samples has type (user, [{ngraphs -> [latency]}])
     for user_samples in samples.iteritems():
         current_user = user_samples[0]
