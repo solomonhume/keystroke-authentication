@@ -91,10 +91,10 @@ class CV(object):
                     timestamp('finished inner loop iteration ' + str(n_inner))
             self.auth.compute_threshold()
             timestamp('finished threshold computation')
-            self.auth.estimate_model(outer_train, outer_val)
+            self.auth.update_model(outer_train, [u])
             timestamp('finished final model estimation')
 
             #yield self.auth.evaluate(outer_train, user_ls=[u]), self.auth.evaluate(outer_val, user_ls=[u])
             yield self.auth.evaluate(outer_val, user_ls=[u])
-            timestamp('finished outer loop iteration' + str(n_outer))
+            timestamp('finished outer loop iteration ' + str(n_outer))
             self.auth.scores = {}

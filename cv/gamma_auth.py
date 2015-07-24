@@ -38,6 +38,8 @@ def compute_likelihoods(params, samples, user_ls=None):
     takes a dictionary {users -> {ngraphs -> parameters}}
     and a dictionary {users -> [{ngraphs -> [latency]}]}
     returns a dictionary {users -> [(likelihoods, 1|0 (genuine/impostor))]}
+
+    possibly refactor to generalize because this looks like compute_ks_score
     '''
     ll_dict = {u:[] 
                for u in (params.keys() if user_ls == None else user_ls)

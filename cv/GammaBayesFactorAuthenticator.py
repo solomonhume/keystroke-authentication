@@ -81,13 +81,10 @@ class GammaBFAuth(Authenticator):
 
 
 if __name__=='__main__':
-    from pprint import PrettyPrinter
-
     from CV import CV
     from preprocessor import split_samples, load_data, filter_users_val
 
     P.np.seterr(all='ignore')
-    pp = PrettyPrinter()
 
     all_data, pkd = filter_users_val(split_samples(load_data()))
 
