@@ -8,6 +8,7 @@ import scipy.stats as stats
 
 from Authenticator import Authenticator, compute_best_threshold, evaluate_threshold
 from data_manip import to_lat_dict, process_latencies, partition_data
+from KS_auth import compute_ks_score
 
 class KSTestAuth(Authenticator):
     def __init__(self, all_data):
@@ -31,9 +32,9 @@ class KSTestAuth(Authenticator):
         self.params = to_lat_dict(training_data)
         
     
-    def score(self, val_data, user_ls=None):
+    def score(self, val_data, user_ls=None, clear_cache=True):
         new_scores = compute_ks_score(self.params, val_data, user_ls)
-        if self.scores = {}:
+        if self.scores == {}:
             self.scores = new_scores
         else: 
             for u in new_scores.keys():
@@ -48,7 +49,7 @@ class KSTestAuth(Authenticator):
             self.thresh[u] = compute_best_threshold(self.scores[u], self.loss)
 
 
-    def evaluate(self, val_data):
+    def evaluate(self, val_data, user_ls=None):
         '''
         also consider moving this into Authenticator.py
         '''

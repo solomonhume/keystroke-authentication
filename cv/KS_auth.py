@@ -17,6 +17,8 @@ def ks_test(samp1, samp2, c_alpha):
     [latency] -> [latency] -> float -> bool
     returns true if samp1 could have been from the same distribution as samp2
     '''
+    if len(samp1)==0 or len(samp2) == 0:
+        return False
     ks_stat, pval = stats.ks_2samp(samp1, samp2)
     n, n_ = len(samp1), len(samp2)
     return ks_stat <= c_alpha*P.np.sqrt( (n+n_) / n*n_ )
@@ -41,7 +43,7 @@ def compute_ks_score(params, samples, user_ls=None):
                 shared_ngs = set(samp.keys()) & set(params[u].keys())
                 ks_score[u].append(
                     ( (sum( int(ks_test(samp[ng], params[u][ng], C_ALPHA))
-                           for ng in shared_ngs )) / float(shared_ngs),
+                            for ng in shared_ngs )) / float(len(shared_ngs)),
                       int(u==current_user)
                       )
                 )
